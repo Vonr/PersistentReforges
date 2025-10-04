@@ -1,0 +1,22 @@
+Configs: {
+	PersistenReforgesConfig: {
+		Chance: {
+			Tooltip: ""
+			Label: Chance
+		}
+
+		SelectMode: {
+			Tooltip: ""
+			Label: Select Mode
+		}
+
+		DisplayName: Persistent Reforges Config
+	}
+
+	SelectionMode: {
+		Random.Label: Random
+		LeastRare.Label: Least Rare
+		Rarest.Label: Rarest
+		Tooltip: ""
+	}
+}

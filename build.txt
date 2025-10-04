@@ -1,0 +1,3 @@
+displayName = Persistent Reforges
+author = Qther
+version = 1.0.0
