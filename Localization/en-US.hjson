@@ -3,19 +3,19 @@ Mods: {
 		Configs: {
 			PersistentReforgesConfig: {
 				Chance: {
-					Tooltip: ""
+					Tooltip: Chance for a crafting ingredient's prefix to persist to the crafted result.
 					Label: Chance
 				}
 
 				SelectMode: {
-					Tooltip: ""
+					Tooltip: The method of selecting which reforge to persist.
 					Label: Select Mode
 				}
 
 				DisplayName: Persistent Reforges Config
 
 				PersistBadReforges: {
-					Tooltip: ""
+					Tooltip: Whether reforges that would decrease the result item's value should be persisted.
 					Label: Persist Bad Reforges
 				}
 			}
