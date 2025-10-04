@@ -2,9 +2,9 @@ using Terraria.ModLoader;
 
 namespace PersistentReforges
 {
-    public class PersistentReforgesPlayer : ModPlayer
+    public class PersistentReforgesSystem : ModSystem
     {
-        public override void Initialize()
+        public override void PostAddRecipes()
         {
             PersistentReforges.Init();
         }

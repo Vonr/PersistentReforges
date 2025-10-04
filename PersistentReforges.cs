@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
@@ -7,16 +8,8 @@ namespace PersistentReforges
 {
     public class PersistentReforges : Mod
     {
-        private static bool init;
-
         public static void Init()
         {
-            if (init)
-            {
-                return;
-            }
-            init = true;
-
             foreach (var recipe in Main.recipe)
             {
                 if (!recipe.createItem.CanHavePrefixes() || recipe.requiredItem.All(static i => !i.CanHavePrefixes()))
@@ -33,7 +26,8 @@ namespace PersistentReforges
                         return;
                     }
 
-                    var prefixes = new (int, float)[consumedItems.Count];
+                    var baseValue = recipe.createItem.value;
+                    var potential = new Item[consumedItems.Count];
                     var numPrefixes = 0;
                     foreach (var component in consumedItems)
                     {
@@ -41,7 +35,13 @@ namespace PersistentReforges
                         {
                             var dummy = recipe.createItem.Clone();
                             dummy.Prefix(component.prefix);
-                            prefixes[numPrefixes] = (component.prefix, dummy.rare);
+
+                            if (config.PersistBadReforges && dummy.value < baseValue)
+                            {
+                                continue;
+                            }
+
+                            potential[numPrefixes] = dummy;
                             numPrefixes += 1;
                         }
                     }
@@ -51,37 +51,29 @@ namespace PersistentReforges
                         return;
                     }
 
-                    prefixes = prefixes[..numPrefixes];
+                    potential = potential[..numPrefixes];
 
-                    int prefix;
-                    switch (config.SelectMode)
+                    int by(Func<Item, long> transform, Func<long, long, long> reducer)
                     {
-                        case PersistentReforgesConfig.SelectionMode.Rarest:
-                            {
-                                var highestRarity = prefixes.Max(static p => p.Item2);
-                                var filtered = prefixes.Where(p => p.Item2 >= highestRarity).ToArray();
-                                prefix = filtered[Main.rand.Next(filtered.Length)].Item1;
+                        var best = potential.Select(transform).Aggregate(reducer);
+                        var filtered = potential.Where(p =>
+                        {
+                            var value = transform.Invoke(p);
+                            return reducer.Invoke(value, best) == value;
+                        }).ToArray();
 
-                                break;
-                            }
-                        case PersistentReforgesConfig.SelectionMode.LeastRare:
-                            {
-                                var lowestRarity = prefixes.Min(static p => p.Item2);
-                                var filtered = prefixes.Where(p => p.Item2 <= lowestRarity).ToArray();
-                                prefix = filtered[Main.rand.Next(filtered.Length)].Item1;
-
-                                break;
-                            }
-                        case PersistentReforgesConfig.SelectionMode.Random:
-                            {
-                                prefix = prefixes[Main.rand.Next(prefixes.Length)].Item1;
-                                break;
-                            }
-                        default:
-                            {
-                                throw new System.NotImplementedException();
-                            }
+                        return Main.rand.NextFromList(filtered).prefix;
                     }
+
+                    var prefix = config.SelectMode switch
+                    {
+                        PersistentReforgesConfig.SelectionMode.HighestValue => by(static i => i.value, Math.Max),
+                        PersistentReforgesConfig.SelectionMode.LowestValue => by(static i => i.value, Math.Min),
+                        PersistentReforgesConfig.SelectionMode.Rarest => by(static i => i.rare, Math.Max),
+                        PersistentReforgesConfig.SelectionMode.LeastRare => by(static i => i.rare, Math.Min),
+                        PersistentReforgesConfig.SelectionMode.Random => Main.rand.NextFromList(potential).prefix,
+                        _ => throw new NotImplementedException(),
+                    };
 
                     item.Prefix(prefix);
                 });

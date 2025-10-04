@@ -13,6 +13,11 @@ Mods: {
 				}
 
 				DisplayName: Persistent Reforges Config
+
+				PersistBadReforges: {
+					Tooltip: ""
+					Label: Persist Bad Reforges
+				}
 			}
 
 			SelectionMode: {
@@ -20,6 +25,8 @@ Mods: {
 				LeastRare.Label: Least Rare
 				Rarest.Label: Rarest
 				Tooltip: ""
+				LowestValue.Label: Lowest Value
+				HighestValue.Label: Highest Value
 			}
 		}
 	}

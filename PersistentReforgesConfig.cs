@@ -8,16 +8,21 @@ namespace PersistentReforges
     {
         public override ConfigScope Mode => ConfigScope.ServerSide;
 
-        [DefaultValue(SelectionMode.Rarest)]
+        [DefaultValue(SelectionMode.HighestValue)]
         public SelectionMode SelectMode { get; set; }
 
         [Slider]
         [DefaultValue(1.0)]
         public float Chance { get; set; }
 
+        [DefaultValue(false)]
+        public bool PersistBadReforges { get; set; }
+
         [JsonConverter(typeof(JsonStringEnumConverter<SelectionMode>))]
         public enum SelectionMode
         {
+            HighestValue,
+            LowestValue,
             Rarest,
             LeastRare,
             Random,
